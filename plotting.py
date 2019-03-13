@@ -198,10 +198,74 @@ def plotAllPatientStages(inData, healthyDiseaseLabels, allModels,
     idxs = np.array(range(len(healthyStages)))
     width = 0.25
     fig, ax = plt.subplots()
-    ax.bar(idxs, healthyStages, width, color='b')
+    ax.bar(idxs, healthyStages, width, color='b', label='HC')
     if(len(unlabelledStages)):
-        ax.bar(idxs+width, unlabelledStages, width, color='k')
-    ax.bar(idxs+2*width, diseaseStages, width, color='r')
+        ax.bar(idxs+width, unlabelledStages, width, color='k', label='other (MCI)')
+    ax.bar(idxs+2*width, diseaseStages, width, color='r', label='AD')
+
+    ax.set_ylabel('Proportion')
+    ax.set_title('Patient stages')
+    ax.set_xticks(idxs+width)
+    ax.set_xticklabels([str(x) for x in idxs])
+
+    y_labels = [str(x) for x in np.arange(0, maxTick+0.1, 0.1)]
+    y_ticks = np.linspace(0, maxEle, len(y_labels))
+
+    ax.set_yticks(y_ticks)
+    ax.set_yticklabels(y_labels)
+
+    return fig, ax
+
+def plotAllPatientStages_new(inData, healthyDiseaseLabels, allModels,
+                         sequence, option=1):
+    """Calls patientStaging_new() instead of patientStaging()
+    
+    See plotAllPatientStages()
+    
+    """
+
+    probMat = getProbMatrix(inData, allModels, healthyDiseaseLabels,
+                            cleanData=False)
+    nPatients = probMat.shape[0]
+    patientStages = np.zeros(nPatients)
+    _,_,patientStages = patientStaging_new(probMat, sequence, option=option)
+
+    patientStages = patientStages.astype(int)
+
+    healthyStages = patientStages[healthyDiseaseLabels == 0]
+    diseaseStages = patientStages[healthyDiseaseLabels == 1]
+    unlabelledStages = patientStages[healthyDiseaseLabels == 2]
+
+    numBins = sequence.shape[0]+1
+    healthyStages = np.bincount(healthyStages, minlength=numBins)
+    diseaseStages = np.bincount(diseaseStages, minlength=numBins)
+    if(len(unlabelledStages)):
+        unlabelledStages = np.bincount(unlabelledStages, minlength=numBins)
+        maxEle = max([max(healthyStages), max(diseaseStages),
+                      max(unlabelledStages)])
+    else:
+        unlabelledStages = []
+        maxEle = max([max(healthyStages), max(diseaseStages)])
+
+    healthyStages = healthyStages/float(sum(healthyStages))
+    diseaseStages = diseaseStages/float(sum(diseaseStages))
+    if(len(unlabelledStages)):
+        unlabelledStages = unlabelledStages/float(sum(unlabelledStages))
+        maxTick = max([max(healthyStages), max(diseaseStages),
+                       max(unlabelledStages)])
+    else:
+        maxTick = max([max(healthyStages), max(diseaseStages)])
+    healthyStages = [math.ceil(x*maxEle) for x in healthyStages]
+    diseaseStages = [math.ceil(x*maxEle) for x in diseaseStages]
+    if(len(unlabelledStages)):
+        unlabelledStages = [math.ceil(x*maxEle) for x in unlabelledStages]
+    idxs = np.array(range(len(healthyStages)))
+    width = 0.25
+    fig, ax = plt.subplots()
+    ax.bar(idxs, healthyStages, width, color='b', label='HC')
+    if(len(unlabelledStages)):
+        ax.bar(idxs+width, unlabelledStages, width, color='k', label='other (MCI)')
+    ax.bar(idxs+2*width, diseaseStages, width, color='r', label='AD')
 
     ax.set_ylabel('Proportion')
     ax.set_title('Patient stages')
