@@ -279,3 +279,57 @@ def plotAllPatientStages_new(inData, healthyDiseaseLabels, allModels,
     ax.set_yticklabels(y_labels)
 
     return fig, ax
+
+
+def plot_pvd_new(finalOrders, bioHeaders, bestSeq=None, bootstrap=False, option='cumulative'):
+    """Plots the MCMC positional mass diagram, a.k.a. positional variance diagram,
+    in different ways:
+    
+    option = 'cumulative'
+      plots the cumulative sum along each row as a separate curve
+    
+    algorithm.
+
+    Returns
+    -------
+    fig,ax : figure and axis objects from matplotlib
+    pmm : positional mass matrix
+    """
+
+    if(bestSeq is None):
+        bestSeq = np.array(finalOrders[0][1])
+        finalOrders = finalOrders[1:]
+    nBioMarkers = len(bestSeq)
+    _, finalOrders = zip(*finalOrders)
+    finalOrders = np.array(finalOrders)
+
+    pmm = np.zeros((nBioMarkers, nBioMarkers))
+    for i in range(nBioMarkers):
+        pmm[i, :] = np.sum(finalOrders == bestSeq[i], axis=0)
+
+    fig, ax = plt.subplots()
+
+    if option=='standard':
+        ax.imshow(pmm, interpolation='nearest', cmap=plt.cm.Blues)
+    elif option=='cumulative':
+        fig,(ax,ax2)=plt.subplots(1,2)
+        ax.imshow(np.cumsum(pmm,axis=1), interpolation='nearest', cmap=plt.cm.Blues)
+        ax2.plot(np.cumsum(pmm,axis=1).T)
+        ax2.legend(bioHeaders[bestSeq])
+    if(bootstrap):
+        ax.set_title('Bootstrapped EBM Output')
+    else:
+        ax.set_title('EBM Output')
+    tick_marks = np.arange(nBioMarkers)
+
+    ax.set_xticks(tick_marks)
+    ax.set_xticklabels(range(1, nBioMarkers+1), rotation=45)
+
+    ax.set_yticks(tick_marks)
+    ax.set_yticklabels(np.array(bioHeaders, dtype='object')[bestSeq],
+                       rotation=30, ha='right',
+                       rotation_mode='anchor')
+
+    ax.set_ylabel('Biomarker Name')
+    ax.set_xlabel('Event Order')
+    return fig, ax, pmm
