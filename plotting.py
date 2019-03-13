@@ -1,7 +1,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import math
-from prototype_ebm.mixture_model import getProbMatrix, patientStaging
+from prototype_ebm.mixture_model import getProbMatrix, patientStaging, patientStaging_new
 from builtins import range
 
 def uncertaintyMatrix(finalOrders, bioHeaders, bestSeq=None, bootstrap=False):
