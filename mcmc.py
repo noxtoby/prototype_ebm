@@ -1,7 +1,7 @@
 import numpy as np
 import itertools
-from ucl_pond_ebm.plotting import greedyAscentTrace
-from ucl_pond_ebm.mixture_model import getProbMatrix
+from prototype_ebm.plotting import greedyAscentTrace
+from prototype_ebm.mixture_model import getProbMatrix
 from builtins import range
 
 

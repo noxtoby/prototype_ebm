@@ -6,11 +6,11 @@
 
 import numpy as np
 import random
-from ucl_pond_ebm.file_readers import adniFileReader
-from ucl_pond_ebm.mcmc import MCMC, bootstrapMCMC
-from ucl_pond_ebm.mixture_model import MixtureModel
-from ucl_pond_ebm.distribution import Distribution
-from ucl_pond_ebm.plotting import uncertaintyMatrix, plotMixtureModels, plotAllPatientStages
+from prototype_ebm.file_readers import adniFileReader
+from prototype_ebm.mcmc import MCMC, bootstrapMCMC
+from prototype_ebm.mixture_model import MixtureModel
+from prototype_ebm.distribution import Distribution
+from prototype_ebm.plotting import uncertaintyMatrix, plotMixtureModels, plotAllPatientStages
 from matplotlib import pyplot as plt
 from builtins import range
 
