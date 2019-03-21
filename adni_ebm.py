@@ -10,7 +10,7 @@ from prototype_ebm.file_readers import adniFileReader
 from prototype_ebm.mcmc import MCMC, bootstrapMCMC
 from prototype_ebm.mixture_model import MixtureModel
 from prototype_ebm.distribution import Distribution
-from prototype_ebm.plotting import uncertaintyMatrix, plotMixtureModels, plotAllPatientStages
+from prototype_ebm.plotting import uncertaintyMatrix, plotMixtureModels, plotAllPatientStages, plotAllPatientStages_new
 from matplotlib import pyplot as plt
 from builtins import range
 
@@ -33,7 +33,7 @@ def main(doBootstrap=False):
 
     fig2, ax2 = uncertaintyMatrix(finalOrders, bioHeaders, bestSeq=bestSeq)
     fig2.show()
-    fig3, ax3 = plotAllPatientStages(allData, allLabels, allModels,
+    fig3, ax3 = plotAllPatientStages_new(allData, allLabels, allModels,
                                      bestSeq)
     fig3.show()
     if(doBootstrap):

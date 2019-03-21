@@ -217,11 +217,12 @@ def plotAllPatientStages(inData, healthyDiseaseLabels, allModels,
     return fig, ax
 
 def plotAllPatientStages_new(inData, healthyDiseaseLabels, allModels,
-                         sequence, option=1):
+                         sequence, option=2):
     """Calls patientStaging_new() instead of patientStaging()
     
     See plotAllPatientStages()
     
+    Neil Oxtoby, 13 March 2019
     """
 
     probMat = getProbMatrix(inData, allModels, healthyDiseaseLabels,

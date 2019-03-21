@@ -220,7 +220,7 @@ def patientStaging(probMat, sequence):
 
     return stages, pStage
 
-def patientStaging_new(probMat, sequence, option=1):
+def patientStaging_new(probMat, sequence, option=2):
     """New version of patientStaging()
     
     Where there is missing data and p(event) = p(not-event) = 0.5, 
