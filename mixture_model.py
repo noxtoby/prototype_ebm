@@ -219,3 +219,67 @@ def patientStaging(probMat, sequence):
         stages[i] = np.argmax(pStage[i])
 
     return stages, pStage
+
+def patientStaging_new(probMat, sequence, option=2):
+    """New version of patientStaging()
+    
+    Where there is missing data and p(event) = p(not-event) = 0.5, 
+    these stages often become the equally-most-likely, so the staging 
+    takes the earliest event.
+    
+    Two options are made available here:
+    1. Use only non-missing data to stage
+    2. Take the average of these stages
+
+    Parameters
+    ----------
+    Same as for patientStaging(), plus
+    option : 1 or 2 (corresponding to the options above)
+
+    Returns
+    -------
+    stages : array-like, shape(numPatients,)
+        List of the maximum likelihood stage for each patient.
+    stages_new: array-like, shape(numPatients,)
+        List of the *new* maximum likelihood stage for each patient.
+    
+    First coded:  13 March 2019
+    Last updated: 13 March 2019
+    """
+    pYes = np.array(probMat[:, sequence, 1])
+    pNo = np.array(probMat[:, sequence, 0])
+    nBioMarkers = len(sequence)
+
+    pStage = np.zeros((len(probMat), nBioMarkers+1))
+    for i in range(nBioMarkers+1):
+        pStage[:, i] = np.prod(pYes[:, :i], 1) * np.prod(pNo[:, i:nBioMarkers], 1)
+
+    stages = np.zeros(len(probMat))
+    for i in range(len(probMat)):
+        stages[i] = np.argmax(pStage[i])
+
+    if option==1:
+        #* Ignore stages with missing data: doesn't handle stage 0 elegantly
+        npwhere = np.where(pYes != 0.5)
+        n = np.max(npwhere[0])+1
+        stages_new = np.empty(stages.shape)
+        for k in np.arange(0,n):
+            x_s = npwhere[0]==k
+            notmissing_k = npwhere[1][x_s]
+            p_stages_k = pStage[k][notmissing_k]
+            stages_new[k] = notmissing_k[np.argmax(p_stages_k)]
+    elif option==2:
+        #* Average of multiple ML stages, rounding up
+        max_probs = np.max(pStage,axis=1)
+        pStage_normalised = pStage / max_probs[:,None]
+        npwhere = np.where(pStage_normalised == pStage_normalised.max(axis=1)[:,None])
+        n = np.max(npwhere[0])+1
+        stages_new = np.empty(stages.shape)
+        for k in np.arange(0,n):
+            x_s = npwhere[0]==k
+            stage_k = np.mean(npwhere[1][x_s])
+            stages_new[k] = np.ceil(stage_k)
+    else:
+        print("patientStaging_new(): ERROR. option=1 or option=2 are the only allowable values. Returning stages_new = None \n")
+        stages_new = None
+    return stages, pStage, stages_new
